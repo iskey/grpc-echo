@@ -59,7 +59,7 @@ func runClient(servers []string) {
 	log.Printf("---")
 	for input := ""; ; input = "" {
 		input = fmt.Sprint(time.Now().Second())
-		got, err := client.Hi(context.Background(), &pb.Msg{Msg: input})
+		got, err := client.Hi(context.Background(), &pb.Msg{Msg: input, Sleep: 2})
 		if err != nil {
 			log.Printf("error: %s", err)
 			time.Sleep(time.Second * 5)

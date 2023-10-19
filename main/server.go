@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -19,12 +20,18 @@ type server struct {
 
 func (s *server) Hi(ctx context.Context, x *pb.Msg) (*pb.Msg, error) {
 	log.Printf("[%s] got: [%s]", s.port, x.GetMsg())
+	serializedData, err := json.Marshal(x)
+	if err != nil {
+		return nil, fmt.Errorf("marshal faild")
+	}
+	log.Print(string(serializedData))
 	return x, nil
 }
 
 func (s *server) Sleep(ctx context.Context, x *pb.Msg) (*pb.Msg, error) {
 	log.Printf("client sleep: [%d]", x.GetSleep())
 	time.Sleep(time.Second * time.Duration(x.GetSleep()))
+	log.Printf(x.String())
 	return x, nil
 }
 
