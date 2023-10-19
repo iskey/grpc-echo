@@ -8,7 +8,7 @@ vendor:
 
 .PHONY: pb
 pb:
-	protoc -I pb echo.proto --go_out=plugins=grpc:pb
+	protoc -I pb echo.proto --go-grpc_out=../
 
 build:
 	@go build -o bin/grpc-echo main/*.go
