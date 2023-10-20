@@ -16,13 +16,13 @@ func newResolveBuilder() r.Builder {
 }
 
 func (b *rBuilder) Build(target r.Target,
-	cc r.ClientConn, opts r.BuildOption) (r.Resolver, error) {
+	cc r.ClientConn, opts r.BuildOptions) (r.Resolver, error) {
 
 	log.Printf("build resolver for cc: %p, target: %+v",
 		cc, target)
 
 	rsv := newResolver(target, cc)
-	rsv.ResolveNow(r.ResolveNowOption{})
+	rsv.ResolveNow(r.ResolveNowOptions{})
 	return rsv, nil
 }
 

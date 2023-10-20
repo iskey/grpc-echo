@@ -15,16 +15,23 @@ import (
 )
 
 type server struct {
-	port string
+	pb.EchoServer
+	Port string
 }
 
 func (s *server) Hi(ctx context.Context, x *pb.Msg) (*pb.Msg, error) {
-	log.Printf("[%s] got: [%s]", s.port, x.GetMsg())
+	log.Printf("[%s] got: [%s]", s.Port, x.GetMsg())
 	serializedData, err := json.Marshal(x)
 	if err != nil {
 		return nil, fmt.Errorf("marshal faild")
 	}
 	log.Print(string(serializedData))
+
+	var person pb.Person
+	if err := x.Data.UnmarshalTo(&person); err != nil {
+		panic(err)
+	}
+	log.Print(person)
 	return x, nil
 }
 
@@ -53,7 +60,7 @@ func runServer(port string) {
 			}),
 		grpc.MaxConcurrentStreams(5),
 	)
-	pb.RegisterEchoServer(s, &server{port})
+	pb.RegisterEchoServer(s, &server{Port: port})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

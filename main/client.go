@@ -3,16 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/anypb"
 	"log"
 	"time"
 
-	"google.golang.org/grpc/balancer/roundrobin"
 	// "google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc"
 
 	"github.com/wrfly/grpc-echo/pb"
 	"github.com/wrfly/grpc-echo/simple"
 )
+
+type MsgPayload struct {
+	name  string
+	score int
+}
 
 func runClient(servers []string) {
 	target := servers[0]
@@ -26,7 +31,7 @@ func runClient(servers []string) {
 
 		// some options
 		grpc.WithInsecure(),
-		grpc.WithBalancerName(roundrobin.Name),
+		//grpc.WithDefaultServiceConfig("{load_balancing_config: { round_robin: {} }}"),
 
 		// block until connected
 		grpc.WithBlock(),
@@ -57,9 +62,19 @@ func runClient(servers []string) {
 
 	client := pb.NewEchoClient(conn)
 	log.Printf("---")
+
+	person := &pb.Person{
+		Name: "Iskey",
+		Age:  30,
+	}
+	payload, err := anypb.New(person)
+	if err != nil {
+		log.Panicf("new err: %s", err)
+	}
+
 	for input := ""; ; input = "" {
 		input = fmt.Sprint(time.Now().Second())
-		got, err := client.Hi(context.Background(), &pb.Msg{Msg: input, Sleep: 2})
+		got, err := client.Hi(context.Background(), &pb.Msg{Msg: input, Sleep: 2, Properties: map[string]string{"time": "2023/10/20"}, Data: payload})
 		if err != nil {
 			log.Printf("error: %s", err)
 			time.Sleep(time.Second * 5)
